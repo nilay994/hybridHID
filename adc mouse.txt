@@ -1,0 +1,81 @@
+//moving cursor as per readings from acc(keyboard)
+if(TM_ADC_Read(ADC1,ADC_Channel_1)<280 && (!GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6)))
+{
+	Keyboard.Key1 = 0x50;   //keyboard left arrow
+	TM_USB_HIDDEVICE_KeyboardSend(&Keyboard);
+}
+else if(TM_ADC_Read(ADC1, ADC_Channel_1)>320 &&(!GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6)))
+{
+	Keyboard.Key1 = 0x4F;   //keyboard right arrow
+	TM_USB_HIDDEVICE_KeyboardSend(&Keyboard);
+}
+
+else if(TM_ADC_Read(ADC1, ADC_Channel_2)<280 &&(!GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6)))
+{
+	Keyboard.Key1 = 0x52;   //keyboard up arrow
+	TM_USB_HIDDEVICE_KeyboardSend(&Keyboard);
+}
+
+else if(TM_ADC_Read(ADC1, ADC_Channel_2)>320 &&!GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6))
+{
+	Keyboard.Key1 = 0x51;   //keyboard down arrow
+	TM_USB_HIDDEVICE_KeyboardSend(&Keyboard);
+}
+
+//moving cursor as per readings from acc(mouse)
+if (TM_ADC_Read(ADC1, ADC_Channel_1)<260 && GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6))
+{
+	Mouse.XAxis = -30;   //mouse left
+	TM_USB_HIDDEVICE_MouseSend(&Mouse);
+}
+else if(TM_ADC_Read(ADC1, ADC_Channel_1)>320 &&(GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6)))
+{
+	Mouse.XAxis = 30;  //mouse right
+	TM_USB_HIDDEVICE_MouseSend(&Mouse);
+}
+
+else if(TM_ADC_Read(ADC1, ADC_Channel_2)<260 &&(GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6)))
+{
+	Mouse.YAxis = -30;   //mouse up
+	TM_USB_HIDDEVICE_MouseSend(&Mouse);
+}
+
+else if(TM_ADC_Read(ADC1, ADC_Channel_2)>320 &&(GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6)))
+{
+	Mouse.YAxis = 30;   //mouse down
+	TM_USB_HIDDEVICE_MouseSend(&Mouse);
+}
+
+if (statespec == 0 && (!GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6))) 
+{
+				statespec = 1;
+				TM_DISCO_LedOn(LED_RED);	
+				Keyboard.L_GUI = 1;	/* Win button */
+				TM_USB_HIDDEVICE_KeyboardSend(&Keyboard);
+				Delayms(100);
+				Keyboard.L_GUI=0;
+				TM_USB_HIDDEVICE_KeyboardSend(&Keyboard);
+					
+        Keyboard.Key1 = 0x11;    //n
+        TM_USB_HIDDEVICE_KeyboardSend(&Keyboard);
+				
+        Keyboard.Key1 = 0x04;    //a
+        TM_USB_HIDDEVICE_KeyboardSend(&Keyboard);
+    
+        Keyboard.Key1 = 0x15;    //r
+        TM_USB_HIDDEVICE_KeyboardSend(&Keyboard);
+    
+        Keyboard.Key1 = 0x15;    //r
+        TM_USB_HIDDEVICE_KeyboardSend(&Keyboard);
+    
+        Keyboard.Key1 = 0x28;   //enter
+		    TM_USB_HIDDEVICE_KeyboardSend(&Keyboard);
+} 
+else if (GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_10) && statespec == 1 && (!GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6))) 
+{ 
+				statespec = 0;
+				Keyboard.L_GUI = 0;	
+				Keyboard.Key1 = 0x00; 								
+				TM_USB_HIDDEVICE_KeyboardSend(&Keyboard);
+				TM_DISCO_LedOff(LED_RED);	
+}
